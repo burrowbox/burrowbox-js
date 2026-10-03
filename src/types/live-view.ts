@@ -39,9 +39,12 @@ export interface LiveViewLink {
   iframe: string;
 }
 
-/** Messages the embedded viewer posts to the parent page (`event.data` with `source: "burrowbox"`). */
+/**
+ * Messages the embedded viewer posts to the parent page (`event.data` with `source: "burrowbox"`).
+ * The viewer also sends `machine` (the machine id), handy when a page embeds several machines.
+ */
 export type LiveViewMessage =
-  | { source: "burrowbox"; type: "connected"; mode: LiveViewMode }
-  | { source: "burrowbox"; type: "disconnected" }
-  | { source: "burrowbox"; type: "url"; url: string; title: string }
-  | { source: "burrowbox"; type: "expired" };
+  | { source: "burrowbox"; type: "connected"; mode: LiveViewMode; machine?: string }
+  | { source: "burrowbox"; type: "disconnected"; machine?: string }
+  | { source: "burrowbox"; type: "url"; url: string; title: string; machine?: string }
+  | { source: "burrowbox"; type: "expired"; machine?: string };
