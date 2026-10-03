@@ -21,13 +21,16 @@ export interface VpnLocations {
   note: string;
 }
 
+/** Public IP and location the machine's traffic leaves from (looked up through the VPN). */
 export interface VpnEgress {
   ok: boolean;
   ip?: string;
+  /** Two-letter country code as the geo-IP service reports it (uppercase, e.g. `DE`). */
   country?: string;
   region?: string;
   city?: string;
   org?: string;
+  /** Why the lookup failed (`ok: false`). */
   error?: string;
 }
 
@@ -37,4 +40,5 @@ export interface MachineVpnStatus {
   egress: VpnEgress | null;
 }
 
+/** The updated machine, plus whether the change was applied live (`note` explains when it wasn't). */
 export type MachineVpnResponse = MachineAppliedResponse;
