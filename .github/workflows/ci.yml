@@ -7,6 +7,26 @@ on:
 
 jobs:
   test:
+    name: Typecheck, test, build (Bun)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.2
+      - run: bun install --frozen-lockfile
+      - run: bun run typecheck
+      - run: bun run test
+      - run: bun run build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist
+          retention-days: 3
+
+  node-smoke:
+    name: Node ${{ matrix.node }} import smoke test (ESM + CJS)
+    needs: test
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -14,11 +34,14 @@ jobs:
         node: [20, 22]
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node }}
-          cache: npm
-      - run: npm ci
-      - run: npm run typecheck
-      - run: npm test
-      - run: npm run build
+      # No install needed: the built package has no runtime dependencies, and the scripts
+      # import it by name through its own "exports" map (package self-reference).
+      - run: node scripts/smoke.mjs
+      - run: node scripts/smoke.cjs
