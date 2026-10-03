@@ -1,0 +1,60 @@
+{
+  "name": "burrowbox",
+  "version": "0.1.0",
+  "description": "TypeScript client for the Burrowbox API: persistent Linux computers for AI agents, with a desktop, a signed-in browser, a credential vault and an MCP endpoint per machine.",
+  "license": "MIT",
+  "homepage": "https://burrowbox.dev",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/burrowbox/burrowbox-js.git"
+  },
+  "keywords": [
+    "burrowbox",
+    "ai-agents",
+    "mcp",
+    "computer-use",
+    "browser",
+    "sandbox",
+    "linux"
+  ],
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": false,
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "tsup",
+    "typecheck": "tsc --noEmit",
+    "lint": "tsc --noEmit -p tsconfig.json",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "prepublishOnly": "npm run typecheck && npm test && npm run build"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.4",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.7"
+  }
+}
