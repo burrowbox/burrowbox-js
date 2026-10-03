@@ -44,7 +44,7 @@ export interface LedgerListParams {
 export interface LedgerEntry {
   id: number | string;
   at: Timestamp;
-  /** e.g. `usage`, `topup`, `signup`, `grant`, `refill`. */
+  /** `usage`, or a credit: `topup` (incl. auto-refills), `signup` or `grant`. */
   kind: string;
   /** Positive = credit, negative = usage. */
   amountMicros: number;

@@ -1,5 +1,5 @@
-import { APIResource, notImplemented } from "../resource.js";
-import type { RequestOptions } from "../http.js";
+import { APIResource } from "../resource.js";
+import { path, type RequestOptions } from "../http.js";
 import type { DeletedResponse } from "../types/common.js";
 import type {
   DeliveryListParams,
@@ -13,34 +13,37 @@ import type {
 
 /** Your HTTPS endpoints that receive signed events (up to 10). `client.events.endpoints` */
 export class EventEndpoints extends APIResource {
-  /** `GET /api/event-webhooks` */
-  async list(options?: RequestOptions): Promise<EventEndpoint[]> {
-    throw notImplemented("events.endpoints.list");
+  /** All endpoints, oldest first (secrets are not included). `GET /api/event-webhooks` */
+  list(options?: RequestOptions): Promise<EventEndpoint[]> {
+    return this._http.get<EventEndpoint[]>("/api/event-webhooks", undefined, options);
   }
 
-  /** Returns the `whsec_` signing secret once. `POST /api/event-webhooks` → 201 */
-  async create(params: EventEndpointCreateParams, options?: RequestOptions): Promise<EventEndpointWithSecret> {
-    throw notImplemented("events.endpoints.create");
+  /**
+   * Returns the `whsec_` signing secret once. `POST /api/event-webhooks` → 201.
+   * `RateLimitError` (429) past 10 endpoints.
+   */
+  create(params: EventEndpointCreateParams, options?: RequestOptions): Promise<EventEndpointWithSecret> {
+    return this._http.post<EventEndpointWithSecret>("/api/event-webhooks", params, options);
   }
 
-  /** `PATCH /api/event-webhooks/{id}` */
-  async update(endpointId: string, params: EventEndpointUpdateParams, options?: RequestOptions): Promise<EventEndpoint> {
-    throw notImplemented("events.endpoints.update");
+  /** Change the URL, events or description, or pause with `enabled: false`. `PATCH /api/event-webhooks/{id}` */
+  update(endpointId: string, params: EventEndpointUpdateParams, options?: RequestOptions): Promise<EventEndpoint> {
+    return this._http.patch<EventEndpoint>(path`/api/event-webhooks/${endpointId}`, params, options);
   }
 
   /** New signing secret (returned once); the old one stops working. `POST /api/event-webhooks/{id}/rotate-secret` */
-  async rotateSecret(endpointId: string, options?: RequestOptions): Promise<EventEndpointWithSecret> {
-    throw notImplemented("events.endpoints.rotateSecret");
+  rotateSecret(endpointId: string, options?: RequestOptions): Promise<EventEndpointWithSecret> {
+    return this._http.post<EventEndpointWithSecret>(path`/api/event-webhooks/${endpointId}/rotate-secret`, {}, options);
   }
 
-  /** Send a `test` event now. `POST /api/event-webhooks/{id}/test` */
-  async test(endpointId: string, options?: RequestOptions): Promise<EventEndpointTestResult> {
-    throw notImplemented("events.endpoints.test");
+  /** Send a `test` event now and report how the endpoint answered. `POST /api/event-webhooks/{id}/test` */
+  test(endpointId: string, options?: RequestOptions): Promise<EventEndpointTestResult> {
+    return this._http.post<EventEndpointTestResult>(path`/api/event-webhooks/${endpointId}/test`, {}, options);
   }
 
   /** `DELETE /api/event-webhooks/{id}` */
-  async delete(endpointId: string, options?: RequestOptions): Promise<DeletedResponse> {
-    throw notImplemented("events.endpoints.delete");
+  delete(endpointId: string, options?: RequestOptions): Promise<DeletedResponse> {
+    return this._http.delete<DeletedResponse>(path`/api/event-webhooks/${endpointId}`, options);
   }
 }
 
@@ -48,8 +51,8 @@ export class EventEndpoints extends APIResource {
 export class Events extends APIResource {
   readonly endpoints: EventEndpoints = new EventEndpoints(this._client);
 
-  /** Recent deliveries. `GET /api/event-webhooks/deliveries?endpoint=&limit=` */
-  async deliveries(params: DeliveryListParams = {}, options?: RequestOptions): Promise<EventDelivery[]> {
-    throw notImplemented("events.deliveries");
+  /** Recent deliveries, newest first. `GET /api/event-webhooks/deliveries?endpoint=&limit=` */
+  deliveries(params: DeliveryListParams = {}, options?: RequestOptions): Promise<EventDelivery[]> {
+    return this._http.get<EventDelivery[]>("/api/event-webhooks/deliveries", { endpoint: params.endpoint, limit: params.limit }, options);
   }
 }
