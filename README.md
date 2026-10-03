@@ -7,10 +7,10 @@ TypeScript client library for the [Burrowbox](https://burrowbox.dev) API: persis
 ## Install
 
 ```bash
-npm install burrowbox
+bun add burrowbox
 ```
 
-No runtime dependencies. Works anywhere with a global `fetch`: Node 18+, Bun, Deno, Cloudflare Workers. Keep API keys on your server.
+npm (`npm install burrowbox`) and pnpm (`pnpm add burrowbox`) work too. No runtime dependencies. Works anywhere with a global `fetch`: Bun, Node 18+, Deno, Cloudflare Workers. Keep API keys on your server.
 
 ## Quickstart
 
@@ -68,13 +68,28 @@ const bb = new Burrowbox({
 });
 ```
 
+### Verify event webhooks
+
+```ts
+import { constructWebhookEvent } from "burrowbox";
+
+// Pass the raw body, not re-serialized JSON. Throws WebhookSignatureError if it doesn't verify.
+const event = await constructWebhookEvent(await req.text(), req.headers.get("burrowbox-signature"), process.env.BURROWBOX_WEBHOOK_SECRET!);
+if (event.type === "machine.stopped") console.log(event.data.machine.id, event.data.detail);
+```
+
+It uses Web Crypto, so the same code runs in Bun, Node, Deno, Workers and edge runtimes.
+
 The full surface is in [API.md](./API.md).
 
 ## Development
 
+The repo uses [Bun](https://bun.sh) for installs and scripts. Tests run on Vitest, the build on tsup (ESM + CJS + types).
+
 ```bash
-npm install
-npm run typecheck && npm test && npm run build
+bun install
+bun run typecheck && bun run test && bun run build
+bun run smoke   # import the built package from Node (ESM and CJS)
 ```
 
 ## License
